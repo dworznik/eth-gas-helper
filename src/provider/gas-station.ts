@@ -23,7 +23,7 @@ export async function fetchGasStationData(apiKey: string): Promise<GasStationDat
 }
 
 export const convertGasStationData = (data: GasStationData): GasPrices =>
-  mapObj(data, x => gasPrice(x).times(100000000));
+  mapObj(data, (k, x) => gasPrice(x).times(100000000));
 
 export function gasStationProvider(apiKey: string): GasPriceProvider {
   return async () => convertGasStationData(await fetchGasStationData(apiKey));

@@ -19,10 +19,10 @@ export async function fetchEthNodeData(url: string): Promise<EthNodeData> {
 }
 
 const defaultMultipliers = {
-  safeLow: 1,
-  average: 1,
-  fast: 1.1,
-  fastest: 1.2,
+  safeLow: bn(1),
+  average: bn(1),
+  fast: bn(1.1),
+  fastest: bn(1.2),
 };
 
 export function getEthNodeDataConverter(multipliers: Factors = defaultMultipliers) {

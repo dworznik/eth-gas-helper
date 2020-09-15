@@ -3,7 +3,6 @@ import { TxData } from 'ethereum-types';
 import { curry, untilSuccess } from './lib';
 import { GasPrice, TxSpeed } from './provider';
 
-
 export { GasPrice, TxSpeed };
 
 export interface GasHelperConfig {

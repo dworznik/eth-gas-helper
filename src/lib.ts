@@ -6,10 +6,10 @@ export const pick = <T, K extends keyof T>(obj: T, ks: readonly K[]): Pick<T, K>
     return acc;
   }, {} as Pick<T, K>);
 
-export const mapObj = <T, K extends keyof T, V extends Record<K, any>>(obj: T, fn: (x: any) => any) =>
+export const mapObj = <T, K extends keyof T, V extends Record<K, any>>(obj: T, fn: (k: K, x: any) => any) =>
   (Object.keys(obj) as Array<K>)
     .reduce((acc: V, k: K) => {
-      acc[k] = fn(obj[k]);
+      acc[k] = fn(k, obj[k]);
       return acc;
     }, {} as V);
 
@@ -44,6 +44,6 @@ export function untilSuccess<T>(tasks: (() => Promise<T | null>)[]): Promise<T |
   );
 }
 
-export function roundUp(val: BigNumber): BigNumber {
-  return val.decimalPlaces(0, BigNumber.ROUND_UP);
+export function roundUp2(val: BigNumber): BigNumber {
+  return val.decimalPlaces(2, BigNumber.ROUND_UP);
 }

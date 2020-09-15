@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js';
-import { mapObj } from 'src/lib';
+import { mapObj, roundUp2 } from 'src/lib';
 
 export * from './gas-station';
 export * from './eth-node';
@@ -10,10 +10,14 @@ export const gasPrice = (val: number | string) => new BigNumber(val);
 export type TxSpeed = 'safeLow' | 'average' | 'fast' | 'fastest';
 export const TX_SPEEDS: TxSpeed[] = ['safeLow', 'average', 'fast', 'fastest'];
 export type GasPrices = { [key in TxSpeed]: GasPrice };
-export type Factors = { [key in TxSpeed]: number };
+export type Factors = { [key in TxSpeed]: BigNumber };
 
 export type GasPriceProvider = () => Promise<GasPrices>;
 
 export const multiply = (val: BigNumber, factors: Factors): GasPrices =>
-  mapObj(factors, x => val.times(x));
+  mapObj(factors, (k, x) => val.times(x));
 
+export const getMultipliers = (values: GasPrices): Factors => {
+  const avg = values.average;
+  return mapObj(values, (k, x) => roundUp2(x.div(avg)));
+};

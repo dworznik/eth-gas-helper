@@ -8,7 +8,7 @@ test('pick', async () => {
 
 test('mapObj', async () => {
   const obj = { a: 1, b: 2, c: 3 };
-  const ret = mapObj(obj, x => x + 1);
+  const ret = mapObj(obj, (k, x) => x + 1);
   expect(ret).toMatchObject({ a: 2, b: 3, c: 4 });
 });
 
