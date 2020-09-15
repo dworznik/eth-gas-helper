@@ -1,11 +1,14 @@
 {
   "name": "@dworznik/eth-gas-helper",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Ethereum gas price helper",
   "engines": {
     "node": ">= 10 <15"
   },
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rimraf coverage dist tmp",
     "build": "ttsc -p tsconfig.release.json",
