@@ -2,6 +2,8 @@ import fetch from 'isomorphic-fetch';
 import { pick, mapObj } from 'src/lib';
 import { GasPrices, gasPrice, TX_SPEEDS, GasPriceProvider } from './index';
 
+const PROVIDER_NAME = 'ethgasstation';
+
 export interface GasStationData {
   average: number;
   fast: number;
@@ -26,7 +28,7 @@ export const convertGasStationData = (data: GasStationData): GasPrices =>
   mapObj(data, (k, x) => gasPrice(x).times(100000000));
 
 export function gasStationProvider(apiKey: string): GasPriceProvider {
-  return async () => convertGasStationData(await fetchGasStationData(apiKey));
+  return async () => ({ data: convertGasStationData(await fetchGasStationData(apiKey)), provider: PROVIDER_NAME });
 }
 
 

@@ -47,3 +47,27 @@ export function untilSuccess<T>(tasks: (() => Promise<T | null>)[]): Promise<T |
 export function roundUp2(val: BigNumber): BigNumber {
   return val.decimalPlaces(2, BigNumber.ROUND_UP);
 }
+
+export function waitFor<T, A extends any[] | any[]>(millis: number, fn: (...a: A) => Promise<T>): (...args: A) => Promise<T> {
+  return async function(...args: A) {
+    return Promise.race([fn(...args), new Promise<T>((res, rej) => {
+      setTimeout(() => rej(new Error('Timeout')), millis);
+    })]);
+  };
+}
+
+export function cacheFor<T, A extends any[] | any[]>(millis: number, fn: (...a: A) => Promise<T>): (...args: A) => Promise<T> {
+  const cache = new Map();
+  return async function(...args: A) {
+    const k = args.join('#');
+    if (cache.has(k)) {
+      return Promise.resolve(cache.get(k));
+    }
+    const ret = await fn(...args);
+    cache.set(k, ret);
+    setTimeout(() => {
+      cache.delete(k);
+    }, millis);
+    return ret;
+  };
+}

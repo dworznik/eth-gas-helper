@@ -1,6 +1,13 @@
-import { ethNodeProvider, gasPrice, GasPriceProvider, gasStationProvider, getEthNodeDataConverter } from './provider';
+import {
+  ethNodeProvider,
+  gasPrice,
+  GasPriceInfo,
+  GasPriceProvider,
+  gasStationProvider,
+  getEthNodeDataConverter,
+} from './provider';
 import { TxData } from 'ethereum-types';
-import { curry, untilSuccess } from './lib';
+import { cacheFor, curry, untilSuccess, waitFor } from './lib';
 import { GasPrice, TxSpeed } from './provider';
 
 export { GasPrice, TxSpeed };
@@ -8,9 +15,12 @@ export { GasPrice, TxSpeed };
 export interface GasHelperConfig {
   gasStationApiKey: string;
   nodeUrl: string;
+  providerTimeout: number;
+  cacheTimeout: number;
+  gasPriceLimit: number;
 }
 
-export type GasPriceEstimator = (speed: TxSpeed) => Promise<GasPrice>;
+export type GasPriceEstimator = (speed: TxSpeed) => Promise<GasPriceInfo>;
 
 export type GasPriceSetter = {
   (speed: TxSpeed, tx: TxData): Promise<TxData>;
@@ -20,22 +30,23 @@ export type GasPriceSetter = {
 const zero = gasPrice(0);
 
 export function getGasPriceEstimator(...providers: GasPriceProvider[]): GasPriceEstimator {
-  return async (speed: TxSpeed): Promise<GasPrice> => {
-    const prices = await untilSuccess(providers.map((p: GasPriceProvider) => () => p()));
-    return prices ? prices[speed] : zero;
+  return async (speed: TxSpeed): Promise<GasPriceInfo> => {
+    const info = await untilSuccess(providers.map((p: GasPriceProvider) => () => p()));
+    return info ? { provider: info.provider, data: info.data[speed] } : { provider: 'dummy', data: zero };
   };
 }
 
 export function getProviders(config: GasHelperConfig): GasPriceProvider[] {
-  return [gasStationProvider(config.gasStationApiKey), ethNodeProvider(config.nodeUrl, getEthNodeDataConverter())];
+  const providers = [gasStationProvider(config.gasStationApiKey), ethNodeProvider(config.nodeUrl, getEthNodeDataConverter())];
+  return providers.map(p => cacheFor(config.cacheTimeout, waitFor(config.providerTimeout, p)));
 }
 
 export const gasPriceEstimator = (config: GasHelperConfig) => getGasPriceEstimator(...getProviders(config));
 
 export function getGasPriceSetter(estimate: GasPriceEstimator): GasPriceSetter {
   return curry(async (speed: TxSpeed, tx: TxData): Promise<TxData> => {
-    const price = await estimate(speed);
-    return { ...tx, gasPrice: price };
+    const info = await estimate(speed);
+    return { ...tx, gasPrice: info.data };
   });
 }
 

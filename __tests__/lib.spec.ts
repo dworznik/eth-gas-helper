@@ -1,4 +1,5 @@
-import { mapObj, pick, tryNull, untilSuccess } from 'src/lib';
+import { cacheFor, mapObj, pick, tryNull, untilSuccess, waitFor } from 'src/lib';
+import { timeout } from '@helpers/timeout';
 
 test('pick', async () => {
   const obj = { a: 1, b: 2, c: 3 };
@@ -43,3 +44,36 @@ test('untilSuccess null', async () => {
   expect(input[2]).toBeCalledTimes(1);
 });
 
+test('waitFor', async () => {
+  const ret = await waitFor(500, () => timeout(100, 42))();
+  expect(ret).toEqual(42);
+});
+
+test('waitFor timeout', async () => {
+  await expect(() =>
+    waitFor(500, async () =>
+      timeout(1000, 42))()).rejects.toThrowError('Timeout');
+});
+
+test('cacheFor', async () => {
+  const counter = (start: number) => {
+    let count = start;
+    return () => Promise.resolve(++count);
+  };
+  const mockFn = jest.fn(counter(0));
+  const fn = async (x: number) => x + await mockFn();
+  const cachedFn = cacheFor(500, fn);
+  expect(await cachedFn(10)).toEqual(11);
+  expect(mockFn.mock.calls.length).toBe(1);
+  expect(await cachedFn(10)).toEqual(11);
+  expect(mockFn.mock.calls.length).toBe(1);
+  expect(await cachedFn(100)).toEqual(102);
+  expect(mockFn.mock.calls.length).toBe(2);
+  expect(await cachedFn(100)).toEqual(102);
+  expect(mockFn.mock.calls.length).toBe(2);
+  await timeout<void>(500);
+  expect(await cachedFn(10)).toEqual(13);
+  expect(mockFn.mock.calls.length).toBe(3);
+  expect(await cachedFn(100)).toEqual(104);
+  expect(mockFn.mock.calls.length).toBe(4);
+});

@@ -1,6 +1,6 @@
 {
   "name": "@dworznik/eth-gas-helper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Ethereum gas price helper",
   "engines": {
     "node": ">= 10 <15"
