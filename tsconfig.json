@@ -1,17 +1,30 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
       "src/*": [
         "src/*"
       ],
-      "tests/*": [
-        "tests/*"
+      "__tests__/*": [
+        "__tests__/*"
+      ],
+      "@helpers/*": [
+        "__tests__/helpers/*"
       ]
     },
+    "rootDirs": [
+      "src",
+      "__tests__/helpers"
+    ],
     "typeRoots": [
+      "src/types",
       "node_modules/@0x/typescript-typings/types",
       "node_modules/@types"
+    ],
+    "plugins": [
+      {
+        "transform": "ts-transformer-imports"
+      }
     ],
     "target": "es5",
     "module": "commonjs",
@@ -24,7 +37,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": "src",
     "strict": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
