@@ -43,3 +43,7 @@ export function untilSuccess<T>(tasks: (() => Promise<T | null>)[]): Promise<T |
     Promise.resolve(null),
   );
 }
+
+export function roundUp(val: BigNumber): BigNumber {
+  return val.decimalPlaces(0, BigNumber.ROUND_UP);
+}

@@ -1,7 +1,8 @@
-import { gasPrice, GasPriceProvider, gasStationProvider } from './provider';
+import { ethNodeProvider, gasPrice, GasPriceProvider, gasStationProvider, getEthNodeDataConverter } from './provider';
 import { TxData } from 'ethereum-types';
 import { curry, untilSuccess } from './lib';
-import { GasPrice, TxSpeed } from 'src/provider';
+import { GasPrice, TxSpeed } from './provider';
+
 
 export { GasPrice, TxSpeed };
 
@@ -17,7 +18,6 @@ export type GasPriceSetter = {
   (tx: TxData): Promise<TxData>;
 };
 
-
 const zero = gasPrice(0);
 
 export function getGasPriceEstimator(...providers: GasPriceProvider[]): GasPriceEstimator {
@@ -28,18 +28,18 @@ export function getGasPriceEstimator(...providers: GasPriceProvider[]): GasPrice
 }
 
 export function getProviders(config: GasHelperConfig): GasPriceProvider[] {
-  return [gasStationProvider(config.gasStationApiKey)];
+  return [gasStationProvider(config.gasStationApiKey), ethNodeProvider(config.nodeUrl, getEthNodeDataConverter())];
 }
 
 export const gasPriceEstimator = (config: GasHelperConfig) => getGasPriceEstimator(...getProviders(config));
 
-export function getPriceSetter(estimate: GasPriceEstimator): GasPriceSetter {
+export function getGasPriceSetter(estimate: GasPriceEstimator): GasPriceSetter {
   return curry(async (speed: TxSpeed, tx: TxData): Promise<TxData> => {
     const price = await estimate(speed);
     return { ...tx, gasPrice: price };
   });
 }
 
-export function priceSetter(config: GasHelperConfig) {
-  return getPriceSetter(gasPriceEstimator(config));
+export function gasPriceSetter(config: GasHelperConfig) {
+  return getGasPriceSetter(gasPriceEstimator(config));
 }

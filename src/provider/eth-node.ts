@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
-import { bn, idInc, pick } from 'src/lib';
-import { GasPriceProvider, GasPrices } from 'src/provider/index';
+import { bn, idInc, pick } from '../lib';
+import { Factors, GasPrices, multiply } from 'src/provider/index';
 
 export interface EthNodeData {
   result: string;
@@ -18,17 +18,21 @@ export async function fetchEthNodeData(url: string): Promise<EthNodeData> {
   return pick(data, ['result']);
 }
 
-export function convertEthNodeData(data: EthNodeData): GasPrices {
-  const average = bn(data.result, 16);
-  return {
-    average,
-    fast: average,
-    fastest: average,
-    safeLow: average,
+const defaultMultipliers = {
+  safeLow: 1,
+  average: 1,
+  fast: 1.1,
+  fastest: 1.2,
+};
+
+export function getEthNodeDataConverter(multipliers: Factors = defaultMultipliers) {
+  return (data: EthNodeData): GasPrices => {
+    const average = bn(data.result, 16);
+    return multiply(average, multipliers);
   };
 }
 
-export function ethNodeProvider(apiKey: string): GasPriceProvider {
-  return async () => convertEthNodeData(await fetchEthNodeData(apiKey));
+export function ethNodeProvider(apiKey: string, converter: (data: EthNodeData) => GasPrices) {
+  return async () => converter(await fetchEthNodeData(apiKey));
 }
 

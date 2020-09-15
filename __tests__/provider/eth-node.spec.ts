@@ -1,18 +1,21 @@
 import 'jest-extended';
-import fetchMock from 'jest-fetch-mock';
-import { ethNodeProvider } from 'src/provider';
+import fetch from '@helpers/fetch';
+import { ethNodeProvider, getEthNodeDataConverter } from 'src/provider';
 
 beforeEach(() => {
-  fetchMock.resetMocks();
+  fetch.reset();
 });
 
 test('eth node success', async () => {
-  fetchMock.mockIf(/^https:\/\/ethnode.*$/,
+  fetch.mock(/^https:\/\/ethnode.*$/,
     req => Promise.resolve({
       status: 200,
       body: '{"jsonrpc":"2.0","id":1,"result":"0x1f6ea08600"}',
     }));
-  const data = await ethNodeProvider('https://ethnode')();
+  const data = await ethNodeProvider('https://ethnode', getEthNodeDataConverter())();
   expect(data).not.toBeNull();
-  Object.values(data).forEach(x => expect(x.toNumber()).toEqual(135000000000));
+  expect(data.average.toNumber()).toEqual(135000000000);
+  expect(data.safeLow.toNumber()).toEqual(135000000000);
+  expect(data.fast.toNumber()).toEqual(148500000000);
+  expect(data.fastest.toNumber()).toEqual(162000000000);
 });
