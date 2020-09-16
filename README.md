@@ -1,10 +1,3 @@
-## TypeScript basic project template
+## Ethereum gas helper
 
-![Node.js CI](https://github.com/dworznik/typescript-basic-starter/workflows/Node.js%20CI/badge.svg)
-
-Includes:
- - Yarn
- - Jest
- - Eslint
- - Prettier
- - Linter commit hook
+![Node.js CI](https://github.com/dworznik/eth-gas-helper/workflows/Node.js%20CI/badge.svg)
