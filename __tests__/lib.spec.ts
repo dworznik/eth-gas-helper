@@ -1,4 +1,5 @@
 import {
+  asyncFlow,
   cacheFor, flow,
   mapObj,
   pick,
@@ -120,5 +121,45 @@ test('flow', () => {
   );
 
   expect(prog(10)).toEqual('foo11');
+});
+
+test('flow error', () => {
+  const prog = flow(
+    (x: number) => x + 1,
+    (y: number) => { throw new Error('fn2')},
+    (z: string) => 'foo' + z,
+  );
+
+  expect(() => prog(10)).toThrowError('fn2');
+});
+
+test('asyncFlow', async () => {
+  const prog = asyncFlow(
+    (x: number) => Promise.resolve(x + 1),
+    (y: number) => timeout(100, `${y}`),
+    (z: string) => Promise.resolve('foo' + z),
+  );
+
+  expect(await prog(10)).toEqual('foo11');
+});
+
+test('asyncFlow with a sync function', async () => {
+  const prog = asyncFlow(
+    (x: number) => Promise.resolve(x + 1),
+    (y: number) => `${y}`,
+    (z: string) => Promise.resolve('foo' + z),
+  );
+
+  expect(await prog(10)).toEqual('foo11');
+});
+
+test('asyncFlow exception', async () => {
+  const prog = asyncFlow(
+    (x: number) => Promise.resolve(x + 1),
+    (y: number) => Promise.reject('error'),
+    (z: string) => Promise.resolve('foo' + z),
+  );
+
+  await expect(() => prog(10)).rejects.toEqual('error');
 });
 
