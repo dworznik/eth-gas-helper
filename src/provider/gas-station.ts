@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+import fetch from 'cross-fetch';
 import { pick, mapObj } from 'src/lib';
 import { GasPrices, gasPrice, TX_SPEEDS, GasPriceProvider } from './index';
 

@@ -1,1 +1,1 @@
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
+jest.mock('cross-fetch', () => require('fetch-mock-jest').sandbox());

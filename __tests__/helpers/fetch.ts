@@ -1,4 +1,4 @@
-import _fetchMock from 'isomorphic-fetch';
+import _fetchMock from 'cross-fetch';
 import { FetchMockJest } from 'fetch-mock-jest';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

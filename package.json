@@ -43,7 +43,6 @@
   "devDependencies": {
     "@0x/typescript-typings": "^5.1.1",
     "@types/fetch-mock": "^7.3.3",
-    "@types/isomorphic-fetch": "^0.0.35",
     "@types/jest": "^26.0.13",
     "@types/node": "^14.10.1",
     "@typescript-eslint/eslint-plugin": "^4.1.0",
@@ -73,6 +72,6 @@
   },
   "dependencies": {
     "bignumber.js": "^9.0.0",
-    "isomorphic-fetch": "^2.2.1"
+    "cross-fetch": "^3.0.6"
   }
 }

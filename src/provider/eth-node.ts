@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+import fetch from 'cross-fetch';
 import { bn, idInc, pick } from '../lib';
 import { Factors, GasPriceProvider, GasPrices, multiply } from 'src/provider/index';
 
