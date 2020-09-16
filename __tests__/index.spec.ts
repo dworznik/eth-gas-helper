@@ -7,7 +7,7 @@ import { timeout } from '@helpers/timeout';
 
 const config: GasHelperConfig = {
   gasStationApiKey: 'test',
-  nodeUrl: 'http://ethnode',
+  ethNodeUrl: 'http://ethnode',
   cacheTimeout: 400,
   gasPriceLimit: 100,
   providerTimeout: 200,

@@ -62,15 +62,12 @@ export function roundUp2(val: BigNumber): BigNumber {
   return val.decimalPlaces(2, BigNumber.ROUND_UP);
 }
 
-export function waitFor<T, A extends any[] | any[]>(millis: number, fn: (...a: A) => Promise<T>, reason = 'Timeout'): (...args: A) => Promise<T> {
-  return async function(...args: A) {
-    return Promise.race([fn(...args), new Promise<T>((res, rej) => {
-      setTimeout(() => rej(new Error(reason)), millis);
-    })]);
-  };
-}
+export const waitFor = (millis: number, reason = 'Timeout') => <T, A extends any[] | any[]>(fn: (...a: A) => Promise<T>): (...args: A) => Promise<T> => async (...args: A) => Promise.race([fn(...args), new Promise<T>((res, rej) => {
+  setTimeout(() => rej(new Error(reason)), millis);
+})]);
 
-export function cacheFor<T, A extends any[] | any[]>(millis: number, fn: (...a: A) => Promise<T>): (...args: A) => Promise<T> {
+
+export const cacheFor = (millis: number) => <T, A extends any[] | any[]>(fn: (...a: A) => Promise<T>): (...args: A) => Promise<T> => {
   const cache = new Map();
   return async function(...args: A) {
     const k = args.join('#');
@@ -84,4 +81,15 @@ export function cacheFor<T, A extends any[] | any[]>(millis: number, fn: (...a: 
     }, millis);
     return ret;
   };
+};
+
+export function flow<T1, T2, A extends any>(fn1: (a: A) => T1, fn2: (a1: T1) => T2): (a: A) => T2;
+export function flow<T1, T2, T3, A extends any>(fn1: (a: A) => T1, fn2: (a1: T1) => T2, fn3: (a2: T2) => T3): (a: A) => T3;
+export function flow<T1, T2, T3, T4, A extends any>(fn1: (a: A) => T1, fn2: (a1: T1) => T2, fn3: (a2: T2) => (a3: T3) => T4): (a: A) => T4;
+
+
+export function flow(...fns: ((a: any) => any)[]) {
+  return (x: any) => fns.reduce((v, f) => f(v), x);
 }
+
+export const identity = <T extends any>(x: T): T => x;

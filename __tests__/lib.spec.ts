@@ -1,5 +1,5 @@
 import {
-  cacheFor,
+  cacheFor, flow,
   mapObj,
   pick,
   tryNull,
@@ -79,13 +79,13 @@ test('untilSuccessWithErrors all errors', async () => {
 });
 
 test('waitFor', async () => {
-  const ret = await waitFor(500, () => timeout(100, 42))();
+  const ret = await waitFor(500)(() => timeout(100, 42))();
   expect(ret).toEqual(42);
 });
 
 test('waitFor timeout', async () => {
   await expect(() =>
-    waitFor(500, async () =>
+    waitFor(500)(async () =>
       timeout(1000, 42))()).rejects.toThrowError('Timeout');
 });
 
@@ -96,7 +96,7 @@ test('cacheFor', async () => {
   };
   const mockFn = jest.fn(counter(0));
   const fn = async (x: number) => x + await mockFn();
-  const cachedFn = cacheFor(500, fn);
+  const cachedFn = cacheFor(500)(fn);
   expect(await cachedFn(10)).toEqual(11);
   expect(mockFn.mock.calls.length).toBe(1);
   expect(await cachedFn(10)).toEqual(11);
@@ -111,3 +111,14 @@ test('cacheFor', async () => {
   expect(await cachedFn(100)).toEqual(104);
   expect(mockFn.mock.calls.length).toBe(4);
 });
+
+test('flow', () => {
+  const prog = flow(
+    (x: number) => x + 1,
+    (y: number) => `${y}`,
+    (z: string) => 'foo' + z,
+  );
+
+  expect(prog(10)).toEqual('foo11');
+});
+

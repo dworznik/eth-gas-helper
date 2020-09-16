@@ -8,13 +8,13 @@ import {
   TxSpeed,
 } from './provider';
 import { TxData } from 'ethereum-types';
-import { cacheFor, curry, untilSuccessWithErrors, waitFor } from './lib';
+import { cacheFor, curry, flow, identity, untilSuccessWithErrors, waitFor } from './lib';
 
 export { GasPrice, TxSpeed };
 
 export interface GasHelperConfig {
   gasStationApiKey: string;
-  nodeUrl: string;
+  ethNodeUrl: string;
   providerTimeout: number;
   cacheTimeout: number;
   gasPriceLimit: number;
@@ -37,12 +37,15 @@ export function getGasPriceEstimator(...providers: GasPriceProvider[]): GasPrice
   };
 }
 
-export function getProviders(config: GasHelperConfig): GasPriceProvider[] {
-  const providers = [gasStationProvider(config.gasStationApiKey), ethNodeProvider(config.nodeUrl, getEthNodeDataConverter())];
-  return providers.map(p => cacheFor(config.cacheTimeout, waitFor(config.providerTimeout, p, 'Provider timeout')));
+export function getDefaultProviders(config: GasHelperConfig): GasPriceProvider[] {
+  const providers = [gasStationProvider(config.gasStationApiKey), ethNodeProvider(config.ethNodeUrl, getEthNodeDataConverter())];
+  return providers.map(flow(
+    config.cacheTimeout > 0 ? cacheFor(config.cacheTimeout) : identity,
+    config.providerTimeout > 0 ? waitFor(config.providerTimeout, 'Provider timeout') : identity,
+  ));
 }
 
-export const gasPriceEstimator = (config: GasHelperConfig) => getGasPriceEstimator(...getProviders(config));
+export const gasPriceEstimator = (config: GasHelperConfig) => getGasPriceEstimator(...getDefaultProviders(config));
 
 export function getGasPriceSetter(estimate: GasPriceEstimator): GasPriceSetter {
   return curry(async (speed: TxSpeed, tx: TxData): Promise<TxData> => {
