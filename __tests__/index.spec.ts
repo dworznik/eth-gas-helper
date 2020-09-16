@@ -1,8 +1,8 @@
-import { gasPriceEstimator, gasPriceSetter } from 'src/index';
+import { gasPriceEstimator, gasPriceSetter } from 'index';
 import fetch from '@helpers/fetch';
-import { gasPrice } from 'src/provider';
+import { gasPrice } from 'provider';
 import { TxData } from 'ethereum-types';
-import { GasHelperConfig } from 'src/index';
+import { GasHelperConfig } from 'index';
 import { timeout } from '@helpers/timeout';
 
 const config: GasHelperConfig = {

@@ -1,5 +1,5 @@
 import fetch from 'cross-fetch';
-import { pick, mapObj } from 'src/lib';
+import { pick, mapObj } from 'lib';
 import { GasPrices, gasPrice, TX_SPEEDS, GasPriceProvider } from './index';
 
 const PROVIDER_NAME = 'ethgasstation';

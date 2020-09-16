@@ -1,4 +1,4 @@
-import { gasPrice, getMultipliers } from 'src/provider';
+import { gasPrice, getMultipliers } from 'provider';
 
 
 test('getMultipliers', () => {

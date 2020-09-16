@@ -1,4 +1,4 @@
-import { gasStationProvider } from 'src/provider/gas-station';
+import { gasStationProvider } from 'provider/gas-station';
 import 'jest-extended';
 import fetch from '@helpers/fetch';
 

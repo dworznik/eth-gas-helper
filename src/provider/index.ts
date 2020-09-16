@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js';
-import { mapObj, roundUp2 } from 'src/lib';
+import { mapObj, roundUp2 } from 'lib';
 
 export * from './gas-station';
 export * from './eth-node';

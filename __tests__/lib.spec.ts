@@ -7,7 +7,7 @@ import {
   untilSuccessOrNull,
   untilSuccessWithErrors,
   waitFor,
-} from 'src/lib';
+} from 'lib';
 import { timeout } from '@helpers/timeout';
 
 test('pick', async () => {

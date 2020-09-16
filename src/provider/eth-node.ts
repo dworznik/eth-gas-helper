@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
-import { bn, idInc, pick } from '../lib';
-import { Factors, GasPriceProvider, GasPrices, multiply } from 'src/provider/index';
+import { bn, idInc, pick } from 'lib';
+import { Factors, GasPriceProvider, GasPrices, multiply } from 'provider/index';
 
 const PROVIDER_NAME = 'eth-node';
 

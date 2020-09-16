@@ -1,6 +1,6 @@
 import 'jest-extended';
 import fetch from '@helpers/fetch';
-import { ethNodeProvider, getEthNodeDataConverter } from 'src/provider';
+import { ethNodeProvider, getEthNodeDataConverter } from 'provider';
 
 beforeEach(() => {
   fetch.reset();

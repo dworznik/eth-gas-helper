@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
       "src/*": [
         "src/*"
@@ -9,7 +9,7 @@
         "__tests__/*"
       ],
       "@helpers/*": [
-        "__tests__/helpers/*"
+        "../__tests__/helpers/*"
       ]
     },
     "rootDirs": [
@@ -23,7 +23,7 @@
     ],
     "plugins": [
       {
-        "transform": "ts-transformer-imports"
+        "transform": "@zerollup/ts-transform-paths"
       }
     ],
     "target": "es5",
