@@ -1,4 +1,12 @@
-import { cacheFor, mapObj, pick, tryNull, untilSuccess, waitFor } from 'src/lib';
+import {
+  cacheFor,
+  mapObj,
+  pick,
+  tryNull,
+  untilSuccessOrNull,
+  untilSuccessWithErrors,
+  waitFor,
+} from 'src/lib';
 import { timeout } from '@helpers/timeout';
 
 test('pick', async () => {
@@ -19,12 +27,12 @@ test('tryNull', async () => {
   expect(ret).toBeNull();
 });
 
-test('untilSuccess', async () => {
+test('untilSuccessOrNull', async () => {
   const input = [
     jest.fn(() => Promise.reject(0)),
     jest.fn(() => Promise.resolve(12)),
     jest.fn(() => Promise.resolve(40))];
-  const ret = await untilSuccess(input);
+  const ret = await untilSuccessOrNull(input);
   expect(ret).toEqual(12);
   expect(input[0]).toBeCalledTimes(1);
   expect(input[1]).toBeCalledTimes(1);
@@ -32,13 +40,39 @@ test('untilSuccess', async () => {
 
 });
 
-test('untilSuccess null', async () => {
+test('untilSuccessOrNull null', async () => {
   const input = [
     jest.fn(() => Promise.reject(0)),
     jest.fn(() => Promise.reject(12)),
     jest.fn(() => Promise.reject(40))];
-  const ret = await untilSuccess(input);
+  const ret = await untilSuccessOrNull(input);
   expect(ret).toBeNull();
+  expect(input[0]).toBeCalledTimes(1);
+  expect(input[1]).toBeCalledTimes(1);
+  expect(input[2]).toBeCalledTimes(1);
+});
+
+
+test('untilSuccessWithErrors', async () => {
+  const input = [
+    jest.fn(() => Promise.reject(new Error('foo'))),
+    jest.fn(() => Promise.resolve(12)),
+    jest.fn(() => Promise.resolve(40))];
+  const ret = await untilSuccessWithErrors(input);
+  expect(ret).toEqual({ value: 12, errors: [new Error('foo')] });
+  expect(input[0]).toBeCalledTimes(1);
+  expect(input[1]).toBeCalledTimes(1);
+  expect(input[2]).toBeCalledTimes(0);
+
+});
+
+test('untilSuccessWithErrors all errors', async () => {
+  const input = [
+    jest.fn(() => Promise.reject(new Error('test'))),
+    jest.fn(() => Promise.reject(new Error('foo'))),
+    jest.fn(() => Promise.reject(new Error('bar')))];
+  const ret = await untilSuccessWithErrors(input);
+  expect(ret).toEqual({ value: undefined, errors: [new Error('test'), new Error('foo'), new Error('bar')] });
   expect(input[0]).toBeCalledTimes(1);
   expect(input[1]).toBeCalledTimes(1);
   expect(input[2]).toBeCalledTimes(1);

@@ -28,6 +28,8 @@ test('estimate the gas price', async () => {
   const fast = await estimate('fast');
   const fastest = await estimate('fastest');
   const safeLow = await estimate('safeLow');
+  expect(average.errors).toBeEmpty();
+  expect(average.provider).toEqual('ethgasstation');
   expect(average.data).toEqual(gasPrice(89000000000));
   expect(fast.data).toEqual(gasPrice(91000000000));
   expect(fastest.data).toEqual(gasPrice(100000000000));
@@ -45,6 +47,8 @@ test('estimate the gas price when gas station fails', async () => {
   const fast = await estimate('fast');
   const fastest = await estimate('fastest');
   const safeLow = await estimate('safeLow');
+  expect(average.errors).toEqual([new Error('Internal Server Error')]);
+  expect(average.provider).toEqual('eth-node');
   expect(average.data).toEqual(gasPrice(135000000000));
   expect(fast.data).toEqual(gasPrice(148500000000));
   expect(fastest.data).toEqual(gasPrice(162000000000));
@@ -91,18 +95,20 @@ test('set the gas price on a tx', async () => {
 
 test('estimate the gas price when providers time out', async () => {
   fetch.get(/^https:\/\/ethgasstation\.info\/api\/ethgasAPI\.json\?api-key=.*$/,
+    () => timeout(300, { safeLow: 1000, average: 1000, fast: 2000, fastest: 2100 }));
+  fetch.post('http://ethnode', () => timeout(300, { 'jsonrpc': '2.0', 'id': 1, 'result': '0x1f6ea08600' }));
+
+  const estimate = gasPriceEstimator(config);
+  await expect(async () => estimate('average')).rejects.toEqual(new Error('Provider timeout, Provider timeout'));
+});
+
+test('estimate the gas price when providers timeout', async () => {
+  fetch.get(/^https:\/\/ethgasstation\.info\/api\/ethgasAPI\.json\?api-key=.*$/,
     500);
   fetch.post('http://ethnode', () => timeout(300, { 'jsonrpc': '2.0', 'id': 1, 'result': '0x1f6ea08600' }));
 
   const estimate = gasPriceEstimator(config);
-  const average = await estimate('average');
-  const fast = await estimate('fast');
-  const fastest = await estimate('fastest');
-  const safeLow = await estimate('safeLow');
-  expect(average.data).toEqual(gasPrice(0));
-  expect(fast.data).toEqual(gasPrice(0));
-  expect(fastest.data).toEqual(gasPrice(0));
-  expect(safeLow.data).toEqual(gasPrice(0));
+  await expect(async () => estimate('average')).rejects.toEqual(new Error('Internal Server Error, Provider timeout'));
 });
 
 test('cached estimate', async () => {

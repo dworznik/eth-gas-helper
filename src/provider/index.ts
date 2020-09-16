@@ -8,7 +8,8 @@ export type GasPrice = BigNumber;
 
 export interface GasPriceInfo {
   data: GasPrice,
-  provider: string
+  provider: string,
+  errors: Error[]
 }
 
 export const gasPrice = (val: number | string) => new BigNumber(val);
@@ -20,7 +21,7 @@ export type Factors = { [key in TxSpeed]: BigNumber };
 
 export interface GasPricesInfo {
   data: GasPrices,
-  provider: string
+  provider: string,
 }
 
 export type GasPriceProvider = () => Promise<GasPricesInfo>;
